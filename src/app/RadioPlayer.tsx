@@ -394,16 +394,53 @@ export default function RadioPlayer() {
           )}
         </div>
 
-        {/* Hero title */}
+        {/* Hero title — letter-by-letter drop animation */}
         <div className="relative z-10 flex flex-col items-center px-6 pt-6 text-center sm:pt-8">
-          <h1 className="font-extrabold leading-[0.88]"
-            style={{ fontFamily:"var(--font-display)", fontSize:"clamp(4rem,16vw,9rem)", color:"var(--color-cream)",
-              textShadow:"0 4px 32px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.5)" }}>
-            <span className="block">डीलक्स</span>
-            <span className="block">सैलून</span>
+          <h1
+            className="font-extrabold leading-[0.88] title-animate"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(4rem,16vw,9rem)",
+              color: "var(--color-cream)",
+              textShadow: "0 4px 32px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.5)",
+            }}
+          >
+            {/* Line 1: डीलक्स */}
+            <span className="block">
+              {"डीलक्स".split("").map((ch, i) => (
+                <span
+                  key={`l1-${i}`}
+                  className="title-letter"
+                  style={{ animationDelay: `${i * 0.07}s` }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </span>
+            {/* Line 2: सैलून */}
+            <span className="block">
+              {"सैलून".split("").map((ch, i) => (
+                <span
+                  key={`l2-${i}`}
+                  className="title-letter"
+                  style={{ animationDelay: `${0.4 + i * 0.07}s` }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </span>
           </h1>
-          <p className="mt-2 tracking-[0.42em] uppercase"
-            style={{ fontFamily:"var(--font-mono)", fontSize:"0.58rem", color:"rgba(255,255,255,0.6)" }}>
+          <p
+            className="mt-2 tracking-[0.42em] uppercase"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.58rem",
+              color: "rgba(255,255,255,0.6)",
+              opacity: 0,
+              animation: "letter-drop 0.5s ease forwards",
+              animationDelay: "0.9s",
+            }}
+          >
             {mood.desc}
           </p>
         </div>
