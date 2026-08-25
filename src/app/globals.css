@@ -36,12 +36,12 @@ html, body {
   --color-accent: #3b9eff;
   --color-tint:   rgba(3, 11, 20, 0.65);
 }
-[data-mood="corporate"] {
-  --color-shade:  #0a0e18;
-  --color-cream:  #e8eaf6;
-  --color-sand:   #9fa8da;
-  --color-accent: #5c6bc0;
-  --color-tint:   rgba(10, 14, 24, 0.60);
+[data-mood="highway-raat"] {
+  --color-shade:  #060c18;
+  --color-cream:  #c8d8f0;
+  --color-sand:   #8aaccf;
+  --color-accent: #4a7aaa;
+  --color-tint:   rgba(6, 12, 24, 0.70);
 }
 [data-mood="papa-ke-gaane"] {
   --color-shade:  #1a0e05;
