@@ -116,6 +116,9 @@ export default function RadioPlayer() {
   const silentRef   = useRef<HTMLAudioElement | null>(null);
   const rainRef     = useRef<RainEngineHandle>(null);
   const rainStarted = useRef(false);
+  // Keep latest songIdx + mood accessible inside the stale YT event closure
+  const songIdxRef  = useRef(0);
+  const moodRef     = useRef<typeof MOODS[0]>(MOODS[0]);
 
   const [moodId,      setMoodId]      = useState("saloon");
   const [dropOpen,    setDropOpen]    = useState(false);
@@ -138,6 +141,10 @@ export default function RadioPlayer() {
   const [bgIdx,       setBgIdx]       = useState(0);  // for saloon crossfade
 
   const getStartIdx = useCallback((m: Mood) => Math.floor(Math.random() * m.songs.length), []);
+
+  // Keep refs in sync with latest state so the stale YT event handler can read them
+  useEffect(() => { songIdxRef.current = songIdx; }, [songIdx]);
+  useEffect(() => { moodRef.current = mood; }, [mood]);
 
   /* Clock */
   useEffect(() => {
@@ -254,10 +261,20 @@ export default function RadioPlayer() {
           } else if (e.data === PAUSED) {
             stopPoll();
           } else if (e.data === ENDED) {
-            stopPoll(); loadSong(mood.songs, (songIdx + 1) % mood.songs.length);
+            // Read from refs — NOT stale state
+            stopPoll();
+            const currentMood   = moodRef.current;
+            const currentSongIdx = songIdxRef.current;
+            const nextIdx = (currentSongIdx + 1) % currentMood.songs.length;
+            loadSong(currentMood.songs, nextIdx);
           }
         },
-        onError: () => loadSong(mood.songs, (songIdx + 1) % mood.songs.length),
+        onError: () => {
+          const currentMood    = moodRef.current;
+          const currentSongIdx = songIdxRef.current;
+          const nextIdx = (currentSongIdx + 1) % currentMood.songs.length;
+          loadSong(currentMood.songs, nextIdx);
+        },
       },
     });
     return () => { destroyed = true; stopPoll(); playerRef.current?.destroy(); playerRef.current = null; };
