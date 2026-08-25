@@ -83,7 +83,9 @@ export default function RadioPlayer() {
   const [rainOn,      setRainOn]      = useState(false);
   // Rain starts automatically on first user interaction (can't autostart before gesture)
   const rainStarted = useRef(false);
-  const [bgIdx,       setBgIdx]       = useState(0); // 0 = image.png, 1 = image2.png
+  const [bgIdx,       setBgIdx]       = useState(0);
+  // Tap-to-start overlay — shown until first user gesture
+  const [showOverlay, setShowOverlay] = useState(true);
 
   // Crossfade background slideshow — every 8 seconds
   useEffect(() => {
@@ -202,6 +204,17 @@ export default function RadioPlayer() {
   }, [apiReady]);
 
   const handleStart  = () => { unlock(); playerRef.current?.playVideo(); };
+
+  // Overlay tap — unlock audio context + start playback in one gesture
+  const handleOverlayTap = () => {
+    setShowOverlay(false);
+    unlock();
+    if (playerReady && playerRef.current) {
+      playerRef.current.playVideo();
+    }
+    // Rain starts too (already wired via pointerdown listener in useEffect)
+  };
+
   const handleToggle = () => {
     unlock();
     isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo();
@@ -251,6 +264,44 @@ export default function RadioPlayer() {
   return (
     <div className="relative w-full" style={{ background: "var(--color-shade)" }}>
 
+      {/* ── TAP TO START OVERLAY — disappears on first tap, starts music ── */}
+      {showOverlay && (
+        <div
+          onClick={handleOverlayTap}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer"
+          style={{ background: "rgba(8,19,26,0.82)", backdropFilter: "blur(4px)" }}
+        >
+          <div className="flex flex-col items-center gap-5 text-center px-8">
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{
+                background: "rgba(240,232,216,0.12)",
+                border: "2px solid rgba(240,232,216,0.3)",
+                boxShadow: "0 0 40px rgba(240,232,216,0.08)",
+              }}
+            >
+              <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="rgba(240,232,216,0.9)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+              </svg>
+            </div>
+            <div>
+              <p
+                className="text-2xl font-bold mb-1"
+                style={{ fontFamily: "var(--font-display)", color: "var(--color-cream)", fontSize: "clamp(1.4rem,5vw,2rem)" }}
+              >
+                डीलक्स सैलून
+              </p>
+              <p
+                className="text-sm"
+                style={{ fontFamily: "var(--font-sans)", color: "rgba(240,232,216,0.55)" }}
+              >
+                Tap anywhere to start the radio
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hidden YT player */}
       <div style={{ position:"fixed", bottom:0, right:0, width:"1px", height:"1px",
                     overflow:"hidden", opacity:0.01, pointerEvents:"none", zIndex:-1 }}>
@@ -266,7 +317,7 @@ export default function RadioPlayer() {
         {/* Base layer — image2 always visible underneath */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/image2.png"
+          src="/image2.webp"
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           style={{ zIndex: 1 }}
@@ -275,7 +326,7 @@ export default function RadioPlayer() {
         {/* Top layer — image1 fades in/out */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/image.png"
+          src="/image.webp"
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           style={{
