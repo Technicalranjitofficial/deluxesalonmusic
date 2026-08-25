@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: "Anek Devanagari", sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+  --font-sans:    "Familjen Grotesk", sans-serif;
+
+  --color-shade:       #08131a;
+  --color-shade2:      #0d1f2d;
+  --color-cream:       #f0e8d8;
+  --color-sand:        #c9b89a;
+  --color-live:        #4ade80;
+  --color-brand:       #1a8f5c;
+}
+
+html, body {
+  overflow-x: hidden;
+  background: var(--color-shade);
+}
+
+/* ── Glass chips / pills ──────────────────────────────────────────────── */
+.saloon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(8, 19, 26, 0.6);
+  border: 1px solid rgba(240, 232, 216, 0.16);
+  color: rgba(240, 232, 216, 0.82);
+  font-size: 0.72rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+.saloon-chip:hover,
+.saloon-chip.active {
+  background: rgba(26, 143, 92, 0.25);
+  border-color: rgba(74, 222, 128, 0.45);
+  color: #fff;
+}
+
+/* ── Glass player card ────────────────────────────────────────────────── */
+.saloon-glass {
+  background: rgba(8, 19, 26, 0.72);
+  border: 1px solid rgba(240, 232, 216, 0.11);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+/* ── Play button ──────────────────────────────────────────────────────── */
+.saloon-play-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  color: var(--color-shade);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.saloon-play-btn:hover  { transform: scale(1.06); background: #fff; }
+.saloon-play-btn:disabled { opacity: 0.5; }
+
+/* ── Icon buttons ─────────────────────────────────────────────────────── */
+.saloon-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(240, 232, 216, 0.55);
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.saloon-icon-btn:hover { color: var(--color-cream); background: rgba(240,232,216,0.09); }
+
+/* ── Seek / volume range ──────────────────────────────────────────────── */
+.saloon-range {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 3px;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    rgba(240,232,216,0.75) 0%,
+    rgba(240,232,216,0.75) var(--progress,0%),
+    rgba(240,232,216,0.18) var(--progress,0%),
+    rgba(240,232,216,0.18) 100%
+  );
+}
+.saloon-range::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 10px; height: 10px;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  cursor: pointer;
+}
+.saloon-range::-moz-range-thumb {
+  width: 10px; height: 10px;
+  border-radius: 9999px;
+  background: var(--color-cream);
+  border: none; cursor: pointer;
+}
+
+/* ── Rain canvas & flash overlay ─────────────────────────────────────── */
+#rainCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+#rainCanvas.active { opacity: 1; }
+
+#lightningFlashOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 18;
+  background: rgba(210, 235, 255, 0.92);
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.05s ease-out;
+}
+
+/* ── Vignette + grain ────────────────────────────────────────────────── */
+.saloon-vignette {
+  background: radial-gradient(ellipse at center, transparent 25%, rgba(6,14,20,0.82) 100%);
+}
+.saloon-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+/* Night tint overlay — darkens the daytime backdrop into a moody night feel */
+.saloon-night-tint {
+  background: linear-gradient(
+    160deg,
+    rgba(4, 10, 22, 0.55) 0%,
+    rgba(8, 20, 35, 0.45) 40%,
+    rgba(12, 6, 18, 0.65) 100%
+  );
+}
+
+/* ── Live ping ────────────────────────────────────────────────────────── */
+@keyframes ping {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.animate-ping { animation: ping 1.2s cubic-bezier(0,0,0.2,1) infinite; }
+
+/* ── Disc spin ────────────────────────────────────────────────────────── */
+@keyframes spin-disc {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spinning { animation: spin-disc 4s linear infinite; }
+
+/* ── Rain toggle pill active glow ────────────────────────────────────── */
+.rain-pill-active {
+  background: rgba(26, 143, 92, 0.3) !important;
+  border-color: rgba(74, 222, 128, 0.55) !important;
+  color: #a7f3d0 !important;
+}
