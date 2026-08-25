@@ -6,22 +6,104 @@ import type { RainEngineHandle } from "./RainEngine";
 
 const RainEngine = dynamic(() => import("./RainEngine"), { ssr: false });
 
-const SONGS = "N0jnLZxYwYc.3NWMK2MRqIk.bga_0ziOOfQ.oFxbBeYhLqM.nNhv8A_rJTg.d3lZvNexPL0.CTuvMubzXpU.i1IsLVz6T9Q.5y_TCKNzAMI.fBylcT-TWZw.CTNgz5gb3D8.lFdSi01tpYM.dDR4oiyjUBA.otQmzlm-s7Q.tPNwGuu_rQ4.p1jhKCIoVjI.2OsyNo53MzU.-N-k56i7M2k.rXHY4Cv9cA8.qGOTe3KmCdY.cGKBs7rokos.BtdiNnrftYM.nRJ8vHpi6_g.xKx_80QM2LU.zuPoUsdXrqM.wYdXuNtJkPk.wuLJtA0uJro.RjJxWRFfG3s.wV8njoRVefQ.4ImdbyqnH8w.htMvfOfixuM.5dWbn_qER3s.6Na7GSV9bVY.oEg_iXEWlt4.QjqKXFGM3eI.Dz1Ad3cdtQA.G7AdjVDBLO8.TgHYW8ubFko.uIOrAkrjwp4.HoMSu1iw0Zw.WAgJ8KM5AVQ.OgocnLh9P1M.Zi9UBJQMz3I._dUAVM5ERXA.lRBIcaSV-Ns.9v2bq2JHt4I.Gg9ZUppafLo.w89fWEelFns.fg9G1dacXjk.Y-o8NQ8Y36A.526hvVlBP1U.iCZfjggJg3M.BaAoZA0fup0.cBGDDBHN22U.nG85YFR3o6U.TRUuSFW80Rk.-pIMyf5dOnA.GxaTSDnI71w.XWKazQwFFdY.9f6GhUb-WdM.rMbQufI9xQw.Mfeg92XPXik".split(".");
-
+/* ── Silent WAV unlock ─────────────────────────────────────────────── */
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA";
 
-const ROTATIONS = [
-  { id: "highway-raat",    label: "Highway Raat",    emoji: "🌙" },
-  { id: "saloon-classics", label: "Saloon Classics",  emoji: "✂️" },
-  { id: "dard-90s",        label: "90s Dard",         emoji: "💔" },
-  { id: "shaadi-sunday",   label: "Shaadi & Sunday",  emoji: "🎉" },
-  { id: "all-songs",       label: "All Songs",        emoji: "🎵" },
+/* ── MOODS ─────────────────────────────────────────────────────────── */
+interface Mood {
+  id:         string;
+  label:      string;
+  labelHindi: string;
+  emoji:      string;
+  desc:       string;
+  bg:         string;       // background image path
+  dot:        string;       // color dot
+  songs:      string[];     // YouTube video IDs
+  rainOn:     boolean;      // default rain state for this mood
+}
+
+const MOODS: Mood[] = [
+  {
+    id: "saloon",
+    label: "Saloon Classics",
+    labelHindi: "सैलून",
+    emoji: "✂️",
+    desc: "The tape that never stops at the neighbourhood barber shop",
+    bg: "/image.webp",
+    dot: "#d4a96a",
+    rainOn: false,
+    songs: "N0jnLZxYwYc.3NWMK2MRqIk.bga_0ziOOfQ.oFxbBeYhLqM.nNhv8A_rJTg.d3lZvNexPL0.CTuvMubzXpU.i1IsLVz6T9Q.5y_TCKNzAMI.fBylcT-TWZw.CTNgz5gb3D8.lFdSi01tpYM".split("."),
+  },
+  {
+    id: "coding",
+    label: "Focus & Coding",
+    labelHindi: "फोकस",
+    emoji: "💻",
+    desc: "Deep work mode — lo-fi Bollywood for your best sessions",
+    bg: "/image2.webp",
+    dot: "#3b9eff",
+    rainOn: false,
+    songs: "dDR4oiyjUBA.nYdHqEyZpdk.Irr3fsN9G9c.PufJm6BV8g4.B8iweNaBpis.V3WrZcgeaoQ.3z7tf28mR90.QmEWg3P1GUQ.JdDEVROAKjg.3CM7aSOHc3Q.hw_HpTI_Wkw.DJIkJEMjqfc".split("."),
+  },
+  {
+    id: "corporate",
+    label: "Corporate Life",
+    labelHindi: "ऑफिस",
+    emoji: "🏢",
+    desc: "Office hours with 90s background score — deadline mode",
+    bg: "/image.webp",
+    dot: "#5c6bc0",
+    rainOn: false,
+    songs: "l7iTcZ__Ejg._YB1taxJPgk.hR-0OtU6gxw.xF3gsIssLvM.wTuS2FFgrxs.aA6o96wkEt0.jBpRItrod-Q.CKXG45s96m8.V9mN0qBgEzQ.nqTS7ngviwQ.cNV5hLSa9H8.kjUTs76Gnks".split("."),
+  },
+  {
+    id: "papa-ke-gaane",
+    label: "Papa Ke Zamaane",
+    labelHindi: "पापा के गाने",
+    emoji: "📻",
+    desc: "70s–80s melodies — the real classics from your father's era",
+    bg: "/image.webp",
+    dot: "#e8894a",
+    rainOn: false,
+    songs: "ixCnsZswdpU.wGafZnT75a4._IcVb6hFhPs.4_a0ge-TPJs.vkF1PPHS99s.tZqlD8VN9AE.xKb6lP3JxrA.o31C53fu_so.-1J1XqOKnuw.t3ynYlnIKAI.ojCnlV1MA-k.dReDtHKF0-g".split("."),
+  },
+  {
+    id: "dard",
+    label: "Dard-e-Dil",
+    labelHindi: "दर्द",
+    emoji: "💔",
+    desc: "Kumar Sanu, Alka Yagnik — when feelings have no words",
+    bg: "/image2.webp",
+    dot: "#9b59c8",
+    rainOn: true,
+    songs: "dDR4oiyjUBA.otQmzlm-s7Q.tPNwGuu_rQ4.p1jhKCIoVjI.2OsyNo53MzU.-N-k56i7M2k.rXHY4Cv9cA8.qGOTe3KmCdY.cGKBs7rokos.BtdiNnrftYM.nRJ8vHpi6_g.xKx_80QM2LU".split("."),
+  },
+  {
+    id: "shaadi",
+    label: "Shaadi & Naach",
+    labelHindi: "शादी",
+    emoji: "🎉",
+    desc: "Dance floor hits — every wedding playlist ever made",
+    bg: "/image.webp",
+    dot: "#f06030",
+    rainOn: false,
+    songs: "zuPoUsdXrqM.wYdXuNtJkPk.wuLJtA0uJro.RjJxWRFfG3s.wV8njoRVefQ.4ImdbyqnH8w.htMvfOfixuM.5dWbn_qER3s.6Na7GSV9bVY.oEg_iXEWlt4.QjqKXFGM3eI.Dz1Ad3cdtQA".split("."),
+  },
+  {
+    id: "rain",
+    label: "Baarish Wali Raat",
+    labelHindi: "बारिश",
+    emoji: "🌧️",
+    desc: "Monsoon melodies + real rain sounds — windows fogged, chai hot",
+    bg: "/image2.webp",
+    dot: "#4a8aaa",
+    rainOn: true,
+    songs: "G7AdjVDBLO8.TgHYW8ubFko.uIOrAkrjwp4.HoMSu1iw0Zw.WAgJ8KM5AVQ.OgocnLh9P1M.Zi9UBJQMz3I._dUAVM5ERXA.lRBIcaSV-Ns.9v2bq2JHt4I.Gg9ZUppafLo.w89fWEelFns".split("."),
+  },
 ];
 
-const SPOTIFY_URL  = "https://open.spotify.com/playlist/2AVjI8Z57bqMJVtU3V9X1Q";
-const YT_MUSIC_URL = "https://music.youtube.com/playlist?list=PLTJ1PnzCWyFw";
-
+/* ── YouTube IFrame types ──────────────────────────────────────────── */
 declare global {
   interface Window {
     YT: YTNamespace;
@@ -57,41 +139,44 @@ function fmt(s: number) {
   return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 }
 
+/* ── Component ─────────────────────────────────────────────────────── */
 export default function RadioPlayer() {
-  const ytDivRef    = useRef<HTMLDivElement>(null);
-  const playerRef   = useRef<YTPlayer | null>(null);
-  const pollRef     = useRef<ReturnType<typeof setInterval> | null>(null);
-  const silentRef   = useRef<HTMLAudioElement | null>(null);
-  const rainRef     = useRef<RainEngineHandle>(null);
-  const startIdx    = useRef(Math.floor(Math.random() * SONGS.length));
+  const ytDivRef      = useRef<HTMLDivElement>(null);
+  const playerRef     = useRef<YTPlayer | null>(null);
+  const pollRef       = useRef<ReturnType<typeof setInterval> | null>(null);
+  const silentRef     = useRef<HTMLAudioElement | null>(null);
+  const rainRef       = useRef<RainEngineHandle>(null);
+  const rainStarted   = useRef(false);
 
-  const [apiReady,    setApiReady]    = useState(false);
-  const [playerReady, setPlayerReady] = useState(false);
-  const [hasStarted,  setHasStarted]  = useState(false);
-  const [isPlaying,   setIsPlaying]   = useState(false);
-  const [isMuted,     setIsMuted]     = useState(false);
-  const [volume,      setVolume]      = useState(100);
-  const [curTime,     setCurTime]     = useState(0);
-  const [duration,    setDuration]    = useState(0);
-  const [idx,         setIdx]         = useState(startIdx.current);
-  const [nowPlaying,  setNowPlaying]  = useState("Tuning in…");
-  const [thumbUrl,    setThumbUrl]    = useState(
-    `https://i.ytimg.com/vi/${SONGS[startIdx.current]}/hqdefault.jpg`
-  );
-  const [clockTime,   setClockTime]   = useState("");
-  const [activeRot,   setActiveRot]   = useState(0);
-  const [rainOn,      setRainOn]      = useState(false);
-  // Rain starts automatically on first user interaction (can't autostart before gesture)
-  const rainStarted = useRef(false);
-  const [bgIdx,       setBgIdx]       = useState(0);
-  // Tap-to-start overlay — shown until first user gesture
-  const [showOverlay, setShowOverlay] = useState(true);
+  // Current mood — default saloon
+  const [moodId,       setMoodId]       = useState("saloon");
+  const [dropOpen,     setDropOpen]     = useState(false);
+  const dropRef = useRef<HTMLDivElement>(null);
 
-  // Crossfade background slideshow — every 8 seconds
-  useEffect(() => {
-    const t = setInterval(() => setBgIdx((prev) => (prev + 1) % 2), 8000);
-    return () => clearInterval(t);
-  }, []);
+  const mood = MOODS.find(m => m.id === moodId) ?? MOODS[0];
+
+  const [apiReady,     setApiReady]     = useState(false);
+  const [playerReady,  setPlayerReady]  = useState(false);
+  const [hasStarted,   setHasStarted]   = useState(false);
+  const [isPlaying,    setIsPlaying]    = useState(false);
+  const [isMuted,      setIsMuted]      = useState(false);
+  const [volume,       setVolume]       = useState(100);
+  const [curTime,      setCurTime]      = useState(0);
+  const [duration,     setDuration]     = useState(0);
+  const [songIdx,      setSongIdx]      = useState(0);
+  const [nowPlaying,   setNowPlaying]   = useState("Tuning in…");
+  const [thumbUrl,     setThumbUrl]     = useState(`https://i.ytimg.com/vi/N0jnLZxYwYc/hqdefault.jpg`);
+  const [clockTime,    setClockTime]    = useState("");
+  const [showOverlay,  setShowOverlay]  = useState(true);
+
+  // background crossfade
+  const [bgIdx,        setBgIdx]        = useState(0);
+
+  // Initialise a random start index per mood
+  const getStartIdx = useCallback((m: Mood) =>
+    Math.floor(Math.random() * m.songs.length), []);
+
+  /* Clock */
   useEffect(() => {
     const tick = () =>
       setClockTime(new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }));
@@ -100,7 +185,30 @@ export default function RadioPlayer() {
     return () => clearInterval(t);
   }, []);
 
-  // silent audio unlock
+  /* Crossfade bg every 10s */
+  useEffect(() => {
+    const t = setInterval(() => setBgIdx(p => (p + 1) % 2), 10000);
+    return () => clearInterval(t);
+  }, []);
+
+  /* Apply mood theme via data attribute */
+  useEffect(() => {
+    document.documentElement.setAttribute("data-mood", moodId);
+  }, [moodId]);
+
+  /* Close dropdown on outside click */
+  useEffect(() => {
+    if (!dropOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
+        setDropOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropOpen]);
+
+  /* Silent audio unlock */
   const unlock = useCallback(() => {
     if (!silentRef.current) {
       const a = new Audio(SILENT_WAV);
@@ -111,7 +219,24 @@ export default function RadioPlayer() {
     silentRef.current.play().catch(() => {});
   }, []);
 
-  // load YouTube IFrame API
+  /* Auto-start rain on first gesture */
+  useEffect(() => {
+    const startRainOnce = () => {
+      if (!rainStarted.current) {
+        rainStarted.current = true;
+        if (mood.rainOn) rainRef.current?.start();
+      }
+    };
+    window.addEventListener("pointerdown", startRainOnce, { once: true });
+    window.addEventListener("keydown",     startRainOnce, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", startRainOnce);
+      window.removeEventListener("keydown",     startRainOnce);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Load YouTube IFrame API */
   useEffect(() => {
     if (window.YT?.Player) { setApiReady(true); return; }
     window.onYouTubeIframeAPIReady = () => setApiReady(true);
@@ -122,6 +247,7 @@ export default function RadioPlayer() {
     }
   }, []);
 
+  /* Progress polling */
   const startPoll = useCallback(() => {
     if (pollRef.current) clearInterval(pollRef.current);
     pollRef.current = setInterval(() => {
@@ -130,32 +256,34 @@ export default function RadioPlayer() {
         const dur = playerRef.current?.getDuration()    ?? 0;
         if (isFinite(ct))             setCurTime(ct);
         if (isFinite(dur) && dur > 0) setDuration(dur);
-      } catch { /**/ }
+      } catch { /* ignore */ }
     }, 500);
   }, []);
-
   const stopPoll = useCallback(() => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   }, []);
 
-  const loadSong = useCallback((newIdx: number) => {
-    const id = SONGS[newIdx];
-    setIdx(newIdx);
+  /* Load a specific song */
+  const loadSong = useCallback((songs: string[], idx: number) => {
+    const id = songs[idx];
+    setSongIdx(idx);
     setNowPlaying("Loading…");
     setThumbUrl(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`);
     setCurTime(0); setDuration(0);
     playerRef.current?.loadVideoById(id);
   }, []);
 
-  // create YT player once API ready
+  /* Create YT player once API is ready */
   useEffect(() => {
     if (!apiReady || !ytDivRef.current || playerRef.current) return;
     let destroyed = false;
-    const i = startIdx.current;
+    const startIdx = getStartIdx(mood);
+    setSongIdx(startIdx);
+    const id = mood.songs[startIdx];
 
     playerRef.current = new window.YT.Player(ytDivRef.current, {
       width: "1", height: "1",
-      videoId: SONGS[i],
+      videoId: id,
       playerVars: {
         autoplay: 1, controls: 0, playsinline: 1,
         rel: 0, disablekb: 1, fs: 0,
@@ -170,6 +298,7 @@ export default function RadioPlayer() {
           e.target.playVideo();
           const d = e.target.getVideoData();
           if (d?.title) setNowPlaying(d.title);
+          setThumbUrl(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`);
         },
         onStateChange: (e) => {
           if (destroyed) return;
@@ -187,10 +316,14 @@ export default function RadioPlayer() {
             stopPoll();
           } else if (e.data === ENDED) {
             stopPoll();
-            loadSong((idx + 1) % SONGS.length);
+            const next = (songIdx + 1) % mood.songs.length;
+            loadSong(mood.songs, next);
           }
         },
-        onError: () => loadSong((idx + 1) % SONGS.length),
+        onError: () => {
+          const next = (songIdx + 1) % mood.songs.length;
+          loadSong(mood.songs, next);
+        },
       },
     });
 
@@ -203,24 +336,38 @@ export default function RadioPlayer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiReady]);
 
-  const handleStart  = () => { unlock(); playerRef.current?.playVideo(); };
+  /* Mood change handler */
+  const handleMoodChange = useCallback((newMoodId: string) => {
+    setDropOpen(false);
+    if (newMoodId === moodId) return;
+    setMoodId(newMoodId);
+    const newMood = MOODS.find(m => m.id === newMoodId)!;
+    const idx = getStartIdx(newMood);
+    setSongIdx(idx);
+    setNowPlaying("Loading…");
+    const id = newMood.songs[idx];
+    setThumbUrl(`https://i.ytimg.com/vi/${id}/hqdefault.jpg`);
+    setCurTime(0); setDuration(0);
+    if (playerRef.current) {
+      playerRef.current.loadVideoById(id);
+    }
+    // Rain control per mood
+    if (newMood.rainOn) {
+      rainRef.current?.start();
+    } else {
+      rainRef.current?.stop();
+    }
+  }, [moodId, getStartIdx]);
 
-  // Overlay tap — unlock audio context + start playback in one gesture
+  /* Playback handlers */
   const handleOverlayTap = () => {
     setShowOverlay(false);
     unlock();
-    if (playerReady && playerRef.current) {
-      playerRef.current.playVideo();
-    }
-    // Rain starts too (already wired via pointerdown listener in useEffect)
+    if (playerReady && playerRef.current) playerRef.current.playVideo();
   };
-
-  const handleToggle = () => {
-    unlock();
-    isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo();
-  };
-  const handlePrev   = () => { unlock(); loadSong((idx - 1 + SONGS.length) % SONGS.length); };
-  const handleNext   = () => { unlock(); loadSong((idx + 1) % SONGS.length); };
+  const handleToggle = () => { unlock(); isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo(); };
+  const handlePrev   = () => { unlock(); loadSong(mood.songs, (songIdx - 1 + mood.songs.length) % mood.songs.length); };
+  const handleNext   = () => { unlock(); loadSong(mood.songs, (songIdx + 1) % mood.songs.length); };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = parseFloat(e.target.value);
@@ -232,75 +379,18 @@ export default function RadioPlayer() {
     setVolume(v);
     playerRef.current?.setVolume(v);
     if (v === 0) { playerRef.current?.mute(); setIsMuted(true); }
-    else         { playerRef.current?.unMute(); setIsMuted(false); }
+    else { playerRef.current?.unMute(); setIsMuted(false); }
   };
   const handleMute = () => {
-    if (isMuted) {
-      playerRef.current?.unMute(); playerRef.current?.setVolume(volume || 80); setIsMuted(false);
-    } else {
-      playerRef.current?.mute(); setIsMuted(true);
-    }
+    if (isMuted) { playerRef.current?.unMute(); playerRef.current?.setVolume(volume || 80); setIsMuted(false); }
+    else { playerRef.current?.mute(); setIsMuted(true); }
   };
-
-  // Auto-start rain on first user gesture
-  useEffect(() => {
-    const startRainOnce = () => {
-      if (!rainStarted.current) {
-        rainStarted.current = true;
-        setRainOn(true);
-        rainRef.current?.start();
-      }
-    };
-    window.addEventListener("pointerdown", startRainOnce, { once: true });
-    window.addEventListener("keydown", startRainOnce, { once: true });
-    return () => {
-      window.removeEventListener("pointerdown", startRainOnce);
-      window.removeEventListener("keydown", startRainOnce);
-    };
-  }, []);
 
   const pct = duration > 0 ? (curTime / duration) * 100 : 0;
 
+  /* ── Render ─────────────────────────────────────────────────────── */
   return (
     <div className="relative w-full" style={{ background: "var(--color-shade)" }}>
-
-      {/* ── TAP TO START OVERLAY — disappears on first tap, starts music ── */}
-      {showOverlay && (
-        <div
-          onClick={handleOverlayTap}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer"
-          style={{ background: "rgba(8,19,26,0.82)", backdropFilter: "blur(4px)" }}
-        >
-          <div className="flex flex-col items-center gap-5 text-center px-8">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{
-                background: "rgba(240,232,216,0.12)",
-                border: "2px solid rgba(240,232,216,0.3)",
-                boxShadow: "0 0 40px rgba(240,232,216,0.08)",
-              }}
-            >
-              <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="rgba(240,232,216,0.9)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
-              </svg>
-            </div>
-            <div>
-              <p
-                className="text-2xl font-bold mb-1"
-                style={{ fontFamily: "var(--font-display)", color: "var(--color-cream)", fontSize: "clamp(1.4rem,5vw,2rem)" }}
-              >
-                डीलक्स सैलून
-              </p>
-              <p
-                className="text-sm"
-                style={{ fontFamily: "var(--font-sans)", color: "rgba(240,232,216,0.55)" }}
-              >
-                Tap anywhere to start the radio
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Hidden YT player */}
       <div style={{ position:"fixed", bottom:0, right:0, width:"1px", height:"1px",
@@ -308,94 +398,138 @@ export default function RadioPlayer() {
         <div ref={ytDivRef} />
       </div>
 
-      {/* Rain engine — canvas + flash only, no pill */}
+      {/* Rain engine */}
       <RainEngine ref={rainRef} />
 
-      {/* Full-screen background — crossfade slideshow */}
-      {/* image2 is always the base layer; image1 fades on top of it */}
+      {/* Tap-to-start overlay */}
+      {showOverlay && (
+        <div
+          onClick={handleOverlayTap}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer"
+          style={{ background: "rgba(0,0,0,0.82)", backdropFilter: "blur(6px)" }}
+        >
+          <div className="flex flex-col items-center gap-5 text-center px-8">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center"
+              style={{ background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.25)" }}>
+              <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-2xl font-bold mb-1"
+                style={{ fontFamily:"var(--font-display)", color:"var(--color-cream)", fontSize:"clamp(1.4rem,5vw,2rem)" }}>
+                डीलक्स सैलून
+              </p>
+              <p className="text-sm" style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-sans)" }}>
+                Tap anywhere to start the radio
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Background crossfade — both images always present, top one fades */}
       <div className="fixed inset-0">
-        {/* Base layer — image2 always visible underneath */}
+        {/* Base layer */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/image2.webp"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: 1 }}
-          width={1920} height={1088}
-        />
-        {/* Top layer — image1 fades in/out */}
+        <img src="/image2.webp" alt="" className="absolute inset-0 w-full h-full object-cover" style={{ zIndex:1 }} width={1920} height={1088} />
+        {/* Top layer fades in/out */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/image.webp"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            zIndex: 2,
-            opacity: bgIdx === 0 ? 1 : 0,
-            transition: "opacity 2.5s ease-in-out",
-          }}
-          width={1920} height={1088}
-        />
-        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-night-tint" style={{ zIndex: 3 }} />
-        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-vignette" style={{ zIndex: 4 }} />
-        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-grain" style={{ zIndex: 5 }} />
+        <img src={mood.bg} alt="" className="absolute inset-0 w-full h-full object-cover"
+          style={{ zIndex:2, opacity: bgIdx === 0 ? 1 : 0, transition:"opacity 2.5s ease-in-out" }}
+          width={1920} height={1088} />
+        {/* Mood tint */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-tint" style={{ zIndex:3 }} />
+        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-vignette" style={{ zIndex:4 }} />
+        <div aria-hidden className="pointer-events-none absolute inset-0 saloon-grain" style={{ zIndex:5 }} />
       </div>
 
       {/* Page content */}
       <div className="relative flex min-h-[100dvh] flex-col">
 
-        {/* ── HEADER ────────────────────────────────────────────────── */}
+        {/* Header */}
         <header className="relative z-30 flex items-center justify-between gap-2 px-3 pt-3 sm:px-6 sm:pt-5">
-
           {/* Clock */}
-          <span className="min-w-[5rem] tabular-nums text-xs tracking-[0.18em] uppercase opacity-75"
-            style={{ fontFamily: "var(--font-mono)", color: "var(--color-sand)" }}>
+          <span className="min-w-[5rem] tabular-nums text-xs tracking-[0.18em] uppercase opacity-70"
+            style={{ fontFamily:"var(--font-mono)", color:"var(--color-sand)" }}>
             {clockTime}
           </span>
 
           {/* Live dot */}
-          <span className="flex items-center gap-1.5 text-xs"
-            style={{ fontFamily: "var(--font-sans)", color: "var(--color-sand)" }}>
+          <span className="flex items-center gap-1.5 text-xs" style={{ fontFamily:"var(--font-sans)", color:"var(--color-sand)" }}>
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-70"
-                style={{ background: "var(--color-live)" }} />
-              <span className="relative inline-flex h-2 w-2 rounded-full"
-                style={{ background: "var(--color-live)" }} />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-70" style={{ background:"var(--color-live)" }} />
+              <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background:"var(--color-live)" }} />
             </span>
-            <span className="font-semibold" style={{ color: "var(--color-cream)" }}>Live</span>
+            <span className="font-semibold" style={{ color:"var(--color-cream)" }}>{isPlaying ? "Live" : "—"}</span>
             <span className="opacity-55">online</span>
           </span>
 
-          {/* Right nav */}
-          <nav className="flex flex-col items-end gap-1.5">
-            <div className="flex items-center gap-1.5">
-              <a href={SPOTIFY_URL}  target="_blank" rel="noopener noreferrer" className="saloon-chip">
-                <SpotifyIcon /><span className="hidden sm:inline">Spotify</span>
-              </a>
-              <a href={YT_MUSIC_URL} target="_blank" rel="noopener noreferrer" className="saloon-chip">
-                <YTMusicIcon /><span className="hidden sm:inline">YT Music</span>
-              </a>
-            </div>
-          </nav>
+          {/* Placeholder to keep layout balanced */}
+          <div className="min-w-[5rem]" />
         </header>
 
-        {/* ── HERO TITLE ────────────────────────────────────────────── */}
-        <div className="relative z-10 flex flex-col items-center px-6 pt-6 text-center sm:pt-10">
+        {/* Mood dropdown — centred below header */}
+        <div className="relative z-30 flex justify-center pt-3 sm:pt-4" ref={dropRef}>
+          <button
+            type="button"
+            className="mood-dropdown-btn"
+            onClick={() => setDropOpen(p => !p)}
+            aria-haspopup="listbox"
+            aria-expanded={dropOpen}
+          >
+            <span>{mood.emoji}</span>
+            <span>{mood.label}</span>
+            <svg width={12} height={12} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2}
+              style={{ opacity:0.6, transform: dropOpen ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 0.2s" }}>
+              <path d="M2 4l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          {dropOpen && (
+            <div className="mood-dropdown-panel" role="listbox">
+              {MOODS.map(m => (
+                <div
+                  key={m.id}
+                  role="option"
+                  aria-selected={m.id === moodId}
+                  className={`mood-option ${m.id === moodId ? "active" : ""}`}
+                  onClick={() => handleMoodChange(m.id)}
+                >
+                  <span className="mood-option-dot" style={{ background: m.dot }} />
+                  <span>{m.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{m.label}</div>
+                    <div className="text-[0.7rem] opacity-50 truncate">{m.desc}</div>
+                  </div>
+                  {m.id === moodId && (
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Hero title */}
+        <div className="relative z-10 flex flex-col items-center px-6 pt-6 text-center sm:pt-8">
           <h1
             className="font-extrabold leading-[0.88]"
             style={{
               fontFamily: "var(--font-display)",
               fontSize: "clamp(4rem,16vw,9rem)",
               color: "var(--color-cream)",
-              textShadow: "0 4px 32px rgba(4,10,22,0.85), 0 2px 8px rgba(0,0,0,0.6)",
+              textShadow: "0 4px 32px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.6)",
             }}
           >
             <span className="block">डीलक्स</span>
             <span className="block">सैलून</span>
           </h1>
-          <p className="mt-3 tracking-[0.42em] uppercase opacity-60"
-            style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", color: "var(--color-cream)" }}>
-            Deluxe Salon Music&nbsp;·&nbsp;open all hours
+          <p className="mt-2 tracking-[0.42em] uppercase opacity-55"
+            style={{ fontFamily:"var(--font-mono)", fontSize:"0.58rem", color:"var(--color-cream)" }}>
+            {mood.desc}
           </p>
         </div>
 
@@ -404,70 +538,59 @@ export default function RadioPlayer() {
         {/* Start prompt */}
         {!hasStarted && (
           <div className="relative z-20 mb-6 flex justify-center px-4">
-            <button
-              onClick={handleStart}
-              disabled={!playerReady}
-              className="saloon-glass mx-auto flex w-full max-w-md items-center gap-3 overflow-hidden rounded-2xl px-4 py-3 transition-all hover:border-[rgba(240,232,216,0.3)] disabled:opacity-40"
-              style={{ color: "var(--color-cream)" }}
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: "rgba(240,232,216,0.12)" }}>
+            <button onClick={handleOverlayTap} disabled={!playerReady}
+              className="saloon-glass mx-auto flex w-full max-w-md items-center gap-3 overflow-hidden rounded-2xl px-4 py-3 transition-all hover:border-[rgba(255,255,255,0.28)] disabled:opacity-40"
+              style={{ color:"var(--color-cream)" }}>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background:"rgba(255,255,255,0.1)" }}>
                 <PlayIcon size={20} />
               </span>
               <div className="min-w-0 flex-1 text-left">
-                <p className="font-semibold text-sm" style={{ fontFamily: "var(--font-sans)" }}>
-                  {playerReady ? "Start the Radio" : "Loading…"}
+                <p className="font-semibold text-sm" style={{ fontFamily:"var(--font-sans)" }}>
+                  {playerReady ? `Start — ${mood.label}` : "Loading…"}
                 </p>
-                <p className="text-xs" style={{ color: "rgba(240,232,216,0.55)", fontFamily: "var(--font-sans)" }}>
-                  90s Hindi film songs · round the clock
+                <p className="text-xs" style={{ color:"rgba(255,255,255,0.5)", fontFamily:"var(--font-sans)" }}>
+                  {mood.desc}
                 </p>
               </div>
               <span className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                style={{ background: "var(--color-cream)", color: "var(--color-shade)", fontFamily: "var(--font-sans)" }}>
+                style={{ background:"var(--color-cream)", color:"var(--color-shade)", fontFamily:"var(--font-sans)" }}>
                 {playerReady ? "Play" : "…"}
               </span>
             </button>
           </div>
         )}
 
-        <div className="h-[9rem] sm:h-[10rem]" />
+        <div className="h-[7.5rem] sm:h-[9rem]" />
       </div>
 
-      {/* ── FIXED BOTTOM PLAYER + ROTATION BAR ─────────────────────────── */}
+      {/* Fixed bottom player */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
         <div className="pointer-events-auto">
           <div className="mx-auto w-full max-w-2xl px-3"
-            style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+            style={{ paddingBottom:"max(0.75rem,env(safe-area-inset-bottom))" }}>
 
-            {/* Player card */}
             <div className="saloon-glass mb-2 flex items-center gap-2 rounded-2xl px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
-
-              {/* Disc */}
+              {/* Spinning disc */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={thumbUrl} alt="" width={48} height={48}
+              <img src={thumbUrl} alt="" width={48} height={48}
                 className={`h-11 w-11 shrink-0 rounded-full object-cover ${isPlaying ? "spinning" : ""}`}
-                style={{ boxShadow: "0 0 0 2px rgba(240,232,216,0.15)" }}
-                onError={(e) => { (e.target as HTMLImageElement).src = `https://i.ytimg.com/vi/${SONGS[0]}/hqdefault.jpg`; }}
-              />
+                style={{ boxShadow:`0 0 0 2px ${mood.dot}44` }}
+                onError={e => { (e.target as HTMLImageElement).src = `https://i.ytimg.com/vi/${mood.songs[0]}/hqdefault.jpg`; }} />
 
               {/* Track info */}
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-sm"
-                  style={{ color: "var(--color-cream)", fontFamily: "var(--font-sans)" }}>
+                <p className="truncate font-semibold text-sm" style={{ color:"var(--color-cream)", fontFamily:"var(--font-sans)" }}>
                   {nowPlaying}
                 </p>
-                <p className="truncate text-xs opacity-50"
-                  style={{ color: "var(--color-cream)", fontFamily: "var(--font-sans)" }}>
-                  Deluxe Salon Music radio
+                <p className="truncate text-xs opacity-45" style={{ color:"var(--color-cream)", fontFamily:"var(--font-sans)" }}>
+                  {mood.emoji} {mood.label}
                 </p>
                 <div className="mt-1.5 flex items-center gap-2">
                   <input type="range" min={0} max={duration || 1} step={1} value={curTime}
-                    onChange={handleSeek} aria-label="Seek"
-                    className="saloon-range h-[3px] w-full"
-                    style={{ "--progress": `${pct}%` } as React.CSSProperties} />
+                    onChange={handleSeek} aria-label="Seek" className="saloon-range h-[3px] w-full"
+                    style={{ "--progress":`${pct}%` } as React.CSSProperties} />
                   <span className="shrink-0 tabular-nums"
-                    style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", color: "rgba(240,232,216,0.45)" }}>
+                    style={{ fontFamily:"var(--font-mono)", fontSize:"0.58rem", color:"rgba(255,255,255,0.4)" }}>
                     {fmt(curTime)}&nbsp;/&nbsp;{fmt(duration)}
                   </span>
                 </div>
@@ -475,43 +598,32 @@ export default function RadioPlayer() {
 
               {/* Controls */}
               <div className="flex shrink-0 items-center gap-0.5">
-                <button type="button" onClick={handlePrev} aria-label="Previous" className="saloon-icon-btn">
-                  <SkipBackIcon />
-                </button>
-                <button type="button"
-                  onClick={hasStarted ? handleToggle : handleStart}
-                  disabled={!playerReady}
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  className="saloon-play-btn">
+                <button type="button" onClick={handlePrev} aria-label="Previous" className="saloon-icon-btn"><SkipBackIcon /></button>
+                <button type="button" onClick={hasStarted ? handleToggle : handleOverlayTap}
+                  disabled={!playerReady} aria-label={isPlaying ? "Pause" : "Play"} className="saloon-play-btn">
                   {isPlaying ? <PauseIcon /> : <PlayIcon size={20} />}
                 </button>
-                <button type="button" onClick={handleNext} aria-label="Next" className="saloon-icon-btn">
-                  <SkipFwdIcon />
-                </button>
+                <button type="button" onClick={handleNext} aria-label="Next" className="saloon-icon-btn"><SkipFwdIcon /></button>
               </div>
 
               {/* Volume */}
               <div className="flex shrink-0 items-center gap-1">
-                <button type="button" onClick={handleMute}
-                  aria-label={isMuted ? "Unmute" : "Mute"} className="saloon-icon-btn">
+                <button type="button" onClick={handleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="saloon-icon-btn">
                   {isMuted ? <VolumeOffIcon /> : <VolumeIcon />}
                 </button>
                 <input type="range" min={0} max={100} step={1} value={isMuted ? 0 : volume}
                   onChange={handleVolume} aria-label="Volume"
                   className="saloon-range hidden h-[3px] w-14 sm:block"
-                  style={{ "--progress": `${isMuted ? 0 : volume}%` } as React.CSSProperties} />
+                  style={{ "--progress":`${isMuted ? 0 : volume}%` } as React.CSSProperties} />
               </div>
             </div>
 
-            {/* Rotation bar */}
-            <div className="flex items-center justify-center gap-1 pb-0.5 flex-wrap">
-              {ROTATIONS.map((r, i) => (
-                <button key={r.id} onClick={() => setActiveRot(i)}
-                  className={`saloon-chip gap-1 py-1 ${activeRot === i ? "active" : ""}`}>
-                  <span aria-hidden className="text-[11px]">{r.emoji}</span>
-                  <span>{r.label}</span>
-                </button>
-              ))}
+            {/* Mood tag below player */}
+            <div className="flex justify-center pb-0.5">
+              <span className="text-[0.65rem] opacity-40 tracking-widest uppercase"
+                style={{ fontFamily:"var(--font-mono)", color:"var(--color-sand)" }}>
+                {mood.labelHindi} &nbsp;·&nbsp; Deluxe Salon Music
+              </span>
             </div>
           </div>
         </div>
@@ -520,6 +632,7 @@ export default function RadioPlayer() {
   );
 }
 
+/* ── Icons ─────────────────────────────────────────────────────────── */
 function PlayIcon({ size = 16 }: { size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" /></svg>;
 }
@@ -537,10 +650,4 @@ function VolumeIcon() {
 }
 function VolumeOffIcon() {
   return <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" /><line x1="22" y1="2" x2="2" y2="22" /></svg>;
-}
-function SpotifyIcon() {
-  return <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ color:"#1ED760" }}><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.12-.899-.48-.12-.421.12-.78.479-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.362 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" /></svg>;
-}
-function YTMusicIcon() {
-  return <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden style={{ color:"#FF0033" }}><path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z" /></svg>;
 }

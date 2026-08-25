@@ -5,12 +5,13 @@
   --font-mono:    "JetBrains Mono", monospace;
   --font-sans:    "Familjen Grotesk", sans-serif;
 
+  /* Default (Saloon) theme */
   --color-shade:       #08131a;
-  --color-shade2:      #0d1f2d;
   --color-cream:       #f0e8d8;
   --color-sand:        #c9b89a;
   --color-live:        #4ade80;
-  --color-brand:       #1a8f5c;
+  --color-accent:      #f0e8d8;
+  --color-tint:        rgba(8, 19, 26, 0.55);
 }
 
 html, body {
@@ -18,16 +19,69 @@ html, body {
   background: var(--color-shade);
 }
 
-/* ── Glass chips / pills ──────────────────────────────────────────────── */
+/* ── Mood theme overrides ─────────────────────────────────────────── */
+/* Applied via data-mood attribute on <html> or wrapper div */
+
+[data-mood="saloon"] {
+  --color-shade:  #08131a;
+  --color-cream:  #f0e8d8;
+  --color-sand:   #c9b89a;
+  --color-accent: #d4a96a;
+  --color-tint:   rgba(8, 19, 26, 0.55);
+}
+[data-mood="coding"] {
+  --color-shade:  #030b14;
+  --color-cream:  #a8d8ff;
+  --color-sand:   #7ab3d4;
+  --color-accent: #3b9eff;
+  --color-tint:   rgba(3, 11, 20, 0.65);
+}
+[data-mood="corporate"] {
+  --color-shade:  #0a0e18;
+  --color-cream:  #e8eaf6;
+  --color-sand:   #9fa8da;
+  --color-accent: #5c6bc0;
+  --color-tint:   rgba(10, 14, 24, 0.60);
+}
+[data-mood="papa-ke-gaane"] {
+  --color-shade:  #1a0e05;
+  --color-cream:  #fde8c8;
+  --color-sand:   #d4a96a;
+  --color-accent: #e8894a;
+  --color-tint:   rgba(26, 14, 5, 0.50);
+}
+[data-mood="dard"] {
+  --color-shade:  #100818;
+  --color-cream:  #f0d8f8;
+  --color-sand:   #c49ad8;
+  --color-accent: #9b59c8;
+  --color-tint:   rgba(16, 8, 24, 0.65);
+}
+[data-mood="shaadi"] {
+  --color-shade:  #1a0808;
+  --color-cream:  #ffe8c8;
+  --color-sand:   #f4a84a;
+  --color-accent: #f06030;
+  --color-tint:   rgba(26, 8, 8, 0.45);
+}
+[data-mood="rain"] {
+  --color-shade:  #060e18;
+  --color-cream:  #d8eaf8;
+  --color-sand:   #8ab4cc;
+  --color-accent: #4a8aaa;
+  --color-tint:   rgba(6, 14, 24, 0.70);
+}
+
+/* ── Glass chips / pills ──────────────────────────────────────────── */
 .saloon-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background: rgba(8, 19, 26, 0.6);
-  border: 1px solid rgba(240, 232, 216, 0.16);
-  color: rgba(240, 232, 216, 0.82);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255,255,255, 0.14);
+  color: rgba(255,255,255, 0.75);
   font-size: 0.72rem;
   font-family: var(--font-sans);
   cursor: pointer;
@@ -37,22 +91,95 @@ html, body {
   -webkit-backdrop-filter: blur(12px);
   white-space: nowrap;
 }
-.saloon-chip:hover,
-.saloon-chip.active {
-  background: rgba(26, 143, 92, 0.25);
-  border-color: rgba(74, 222, 128, 0.45);
-  color: #fff;
+.saloon-chip:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.32);
+  color: var(--color-cream);
 }
 
-/* ── Glass player card ────────────────────────────────────────────────── */
+/* ── Mood dropdown ────────────────────────────────────────────────── */
+.mood-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  background: rgba(0,0,0,0.5);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: var(--color-cream);
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.mood-dropdown-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.mood-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  border-radius: 16px;
+  background: rgba(8,12,20,0.92);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 6px;
+  z-index: 99;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  animation: dropdown-in 0.18s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.mood-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.55rem 0.875rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.78);
+}
+.mood-option:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.mood-option.active {
+  background: rgba(255,255,255,0.13);
+  color: #fff;
+  font-weight: 600;
+}
+.mood-option-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* ── Glass player card ────────────────────────────────────────────── */
 .saloon-glass {
-  background: rgba(8, 19, 26, 0.72);
-  border: 1px solid rgba(240, 232, 216, 0.11);
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255,255,255, 0.11);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
 }
 
-/* ── Play button ──────────────────────────────────────────────────────── */
+/* ── Play button ──────────────────────────────────────────────────── */
 .saloon-play-btn {
   width: 2.75rem;
   height: 2.75rem;
@@ -68,7 +195,7 @@ html, body {
 .saloon-play-btn:hover  { transform: scale(1.06); background: #fff; }
 .saloon-play-btn:disabled { opacity: 0.5; }
 
-/* ── Icon buttons ─────────────────────────────────────────────────────── */
+/* ── Icon buttons ─────────────────────────────────────────────────── */
 .saloon-icon-btn {
   width: 2rem;
   height: 2rem;
@@ -76,13 +203,13 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(240, 232, 216, 0.55);
+  color: rgba(255,255,255, 0.5);
   transition: color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
-.saloon-icon-btn:hover { color: var(--color-cream); background: rgba(240,232,216,0.09); }
+.saloon-icon-btn:hover { color: var(--color-cream); background: rgba(255,255,255,0.09); }
 
-/* ── Seek / volume range ──────────────────────────────────────────────── */
+/* ── Seek / volume range ──────────────────────────────────────────── */
 .saloon-range {
   appearance: none;
   -webkit-appearance: none;
@@ -92,10 +219,10 @@ html, body {
   cursor: pointer;
   background: linear-gradient(
     to right,
-    rgba(240,232,216,0.75) 0%,
-    rgba(240,232,216,0.75) var(--progress,0%),
-    rgba(240,232,216,0.18) var(--progress,0%),
-    rgba(240,232,216,0.18) 100%
+    var(--color-accent) 0%,
+    var(--color-accent) var(--progress, 0%),
+    rgba(255,255,255,0.15) var(--progress, 0%),
+    rgba(255,255,255,0.15) 100%
   );
 }
 .saloon-range::-webkit-slider-thumb {
@@ -112,7 +239,7 @@ html, body {
   border: none; cursor: pointer;
 }
 
-/* ── Rain canvas & flash overlay ─────────────────────────────────────── */
+/* ── Rain canvas & flash overlay ─────────────────────────────────── */
 #rainCanvas {
   position: fixed;
   inset: 0;
@@ -138,40 +265,27 @@ html, body {
   transition: opacity 0.05s ease-out;
 }
 
-/* ── Vignette + grain ────────────────────────────────────────────────── */
+/* ── Overlays ────────────────────────────────────────────────────── */
 .saloon-vignette {
-  background: radial-gradient(ellipse at center, transparent 25%, rgba(6,14,20,0.82) 100%);
+  background: radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.78) 100%);
 }
 .saloon-grain {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
-/* Night tint overlay — darkens the daytime backdrop into a moody night feel */
-.saloon-night-tint {
-  background: linear-gradient(
-    160deg,
-    rgba(4, 10, 22, 0.55) 0%,
-    rgba(8, 20, 35, 0.45) 40%,
-    rgba(12, 6, 18, 0.65) 100%
-  );
+.saloon-tint {
+  background: var(--color-tint);
 }
 
-/* ── Live ping ────────────────────────────────────────────────────────── */
+/* ── Live ping ────────────────────────────────────────────────────── */
 @keyframes ping {
   75%, 100% { transform: scale(2.2); opacity: 0; }
 }
 .animate-ping { animation: ping 1.2s cubic-bezier(0,0,0.2,1) infinite; }
 
-/* ── Disc spin ────────────────────────────────────────────────────────── */
+/* ── Disc spin ────────────────────────────────────────────────────── */
 @keyframes spin-disc {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 .spinning { animation: spin-disc 4s linear infinite; }
-
-/* ── Rain toggle pill active glow ────────────────────────────────────── */
-.rain-pill-active {
-  background: rgba(26, 143, 92, 0.3) !important;
-  border-color: rgba(74, 222, 128, 0.55) !important;
-  color: #a7f3d0 !important;
-}
