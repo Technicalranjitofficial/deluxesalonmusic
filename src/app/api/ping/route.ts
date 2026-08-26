@@ -37,13 +37,9 @@ async function submitIndexNow() {
 }
 
 async function pingBingSitemap() {
-  const url = `https://www.bing.com/ping?sitemap=${encodeURIComponent(`${SITE_URL}/sitemap.xml`)}`;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    return `bing-sitemap: ${res.status}`;
-  } catch {
-    return "bing-sitemap: error";
-  }
+  // Bing's old /ping endpoint is deprecated (returns 410 Gone)
+  // IndexNow (above) is the replacement — no action needed here
+  return "bing-sitemap: skipped (deprecated, covered by IndexNow)";
 }
 
 export async function POST(req: Request) {
