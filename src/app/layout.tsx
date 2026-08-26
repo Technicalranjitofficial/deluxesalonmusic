@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const BASE_URL = "https://deluxesalonmusic.com";
+const BASE_URL = "https://www.deluxesalonmusic.com";
 
 export const viewport: Viewport = {
   themeColor: "#08131a",

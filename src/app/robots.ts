@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [],
       },
     ],
-    sitemap: "https://deluxesalonmusic.com/sitemap.xml",
-    host: "https://deluxesalonmusic.com",
+    sitemap: "https://www.deluxesalonmusic.com/sitemap.xml",
+    host: "https://www.deluxesalonmusic.com",
   };
 }
