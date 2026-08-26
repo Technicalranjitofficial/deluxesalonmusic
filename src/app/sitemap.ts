@@ -1,12 +1,20 @@
 import type { MetadataRoute } from "next";
 
+const BASE = "https://www.deluxesalonmusic.com";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://www.deluxesalonmusic.com",
+      url: BASE,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "daily",
       priority: 1,
+    },
+    {
+      url: `${BASE}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
   ];
 }
